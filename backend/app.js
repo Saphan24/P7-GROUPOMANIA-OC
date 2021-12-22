@@ -1,13 +1,16 @@
 const express = require('express');
 const bodyParser = require("body-parser");
+const path = require('path');
 
+require('dotenv').config();
+
+const userRoutes = require('./routes/user');
+const postRoutes = require('./routes/post');
+const commentRoutes = require('./routes/comment');
+
+
+// Utilisation de la méthode express 
 const app = express();
-
-//analyse les requêtes de type de contenu - application/json
-app.use(bodyParser.json());
-
-//analyse les requêtes de type de contenu - application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -16,9 +19,14 @@ app.use((req, res, next) => {
     next();
 });
 
-// simple route
-app.use("/", (req, res, next) => {
-    res.json({ message: "Bienvenue !!!" });
-});
+//analyse les requêtes de type de contenu
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+//routes
+app.use('/api/user', userRoutes);
+app.use('/api/post', postRoutes);
+app.use('/api/comment', commentRoutes);
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 module.exports = app;

@@ -1,7 +1,6 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
+const { FOREIGNKEYS } = require('sequelize/dist/lib/query-types');
 module.exports = (sequelize, DataTypes) => {
   class Comment extends Model {
     /**
@@ -10,14 +9,33 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      Comment.belongsTo(models.User, {
+        foreignKey: 'userId',
+        onDelete: 'CASCADE'
+      });
+      Comment.belongsTo(models.Post, {
+        foreignKey: 'postId',
+        onDelete: 'CASCADE'
+      });
     }
   };
   Comment.init({
-    userId: DataTypes.STRING,
-    postId: DataTypes.STRING,
-    content: DataTypes.STRING,
-    image: DataTypes.STRING
+    userId: { 
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    postId: { 
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    content: { 
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    image: { 
+      type: DataTypes.STRING,
+      allowNull: true,
+    }
   }, {
     sequelize,
     modelName: 'Comment',
