@@ -14,10 +14,10 @@ exports.createComment = (req, res, next ) => {
   
   // Créer un commentaire
   const comment = new Comment({
-    userId: req.body.userId,
+    userId: autho.userId(req),
     postId: req.body.postId,
     content: req.body.content,
-    image: `${req.protocole}://${req.get('host')}/images/${req.file.filename}`
+    image: req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : null
   });
 
   // Enregistrement d'un commentaire dans la BDD
@@ -28,15 +28,35 @@ exports.createComment = (req, res, next ) => {
 
 //suppression d'un commentaire
 exports.deleteComment = (req, res, next ) => {
-  Comment.findOne({ where: {id: req.params.id}})
-  .then( comment => {
-    const filename = comment.image.split('/images/')[1];
-      fs.unlink(`images/${filename}`,() => {
-        Comment.destroy({ where: {id: req.params.id}})
-          .then(() => res.status(200).json({ message: "commentaire supprimé ! "}))
-          .catch(error => res.status(400).json({ error }));
-      });
+  const { id } = req.params;
+  const { userId } = autho.userId(req); 
+  const { isAdmin } = autho.isAdmin(req);
+
+  Comment.findOne({ where: { id }})
+  .then((comment) => {
+    if (comment.UserId === userId || isAdmin) {
+      /*Post.findOne({ where: {id: comment.postId}})
+        .then((post) => {
+          post.update({ where: {id: comment.postId}})
+            .then(() => res.status(200).json({ message: "Commentaire supprimé ! "}))
+            .catch(error => res.status(400).json({ error }))
+        });*/
+          comment.destroy({ where: { id }})
+            .then(() => res.status(200).json({ message: "commentaire supprimé ! "}))
+            .catch(error => res.status(400).json({ error }));
+    } else {
+      return res.status(401).json({error});
+    }
   })
   .catch(error => res.status(500).json({ error }));
 };
+
+exports.getAllComments = (req, res, next ) => {
+  Comment.findAll({ where: {postId: req.params.id }, 
+    include: [ {model: User} ],
+    order: [["createdAt", "DESC"]]
+  })
+    .then(comment => res.status(200).json(comment))
+    .catch(error => res.status(400).json({error}));
+}
   

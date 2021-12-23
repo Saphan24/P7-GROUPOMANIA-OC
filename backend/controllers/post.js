@@ -35,13 +35,11 @@ exports.getOnePost = (req, res, next) => {
 
 //Affichage des posts
 exports.getAllPosts = (req, res, next) => {
-  Post.findAll({ 
-    include: [
+  Post.findAll({ include: [ 
       { model: User }, // Inclus la relation avec la table Post
-
       { model: Comment, include: [{ model: User }] } // Inclus la table User dans la table Comment
     ], 
-    order: [["createdAt", "DESC"]], // Ordre d'affichage des posts
+    order: [["createdAt", "DESC"]] // Ordre d'affichage des posts
   })
     .then(post => res.status(200).json(post))
     .catch(error => res.status(400).json({error}));
@@ -75,7 +73,7 @@ exports.deletePost = (req, res, next) => {
   const { userId } = autho.userId(req); 
   const { isAdmin } = autho.isAdmin(req);
  
-  Post.findOne({ where: { id }})
+  Post.findOne({ where: { id }}) // on récupère l'id du post dans la BDD
   .then((post) => {
     if (post.UserId === userId || isAdmin) {
       if (!post.image) {
@@ -84,12 +82,12 @@ exports.deletePost = (req, res, next) => {
           Comment.destroy({postId: post.id})
         });
       }
-        Post.destroy({ where: {id}})
-          .then(() => res.status(200).json({ message: "Post supprimé ! "}))
-          .catch(error => res.status(400).json({ error }));
-      } else {
-        return res.status(401).json({error});
-      }
-    })
-    .catch((error) => res.status(500).json({ error }));
+      Post.destroy({ where: {id}})
+        .then(() => res.status(200).json({ message: "Post supprimé ! "}))
+        .catch(error => res.status(400).json({ error }));
+    } else {
+      return res.status(401).json({error});
+    }
+  })
+  .catch((error) => res.status(500).json({ error }));
 };
