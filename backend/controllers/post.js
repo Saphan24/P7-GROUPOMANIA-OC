@@ -29,7 +29,13 @@ exports.createPost = (req, res, next) => {
 //Affichage d'un post
 exports.getOnePost = (req, res, next) => {
   Post.findOne({where: { id: req.params.id }, include: [{ model: User }]})
-    .then(post => res.status(200).json(post))
+    .then(post => {
+      if (!post) {
+        return res.status(404).json({message: 'post non trouvé!'});
+      }
+      
+      return res.status(200).json(post)
+    }) 
     .catch(error => res.status(400).json({error}));
 };
 
@@ -60,7 +66,7 @@ exports.modifyPost = (req, res, next) => {
           ...post,
           image: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
         } : {...req.body, ...post};
-      Post.update({...postObject, id})
+      post.update({...postObject, id})
         .then(() => res.status(200).json({message: "Votre post a été modifié !"}))
         .catch(error => res.status(400).json({ error }));
     })
