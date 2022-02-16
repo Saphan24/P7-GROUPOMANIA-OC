@@ -176,7 +176,7 @@ export default {
       axios.post("http://localhost:3000/api/user/signup", body)
       .then(response => {
         console.log(response)
-        this.$router.push("/home");
+        this.$router.push("/");
       })
       .catch(() => {
         alert( "une erreur est survenue dans le formulaire" )
