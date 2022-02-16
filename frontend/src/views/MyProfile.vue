@@ -36,7 +36,7 @@
               <b-card>{{ profile.description }}</b-card>
             </b-form-group>
 
-            <p class="text-center">Vous êtes inscrit depuis le:{{ profile.createdAt | formatDate }}</p>
+            <p class="text-center">Vous êtes inscrit depuis à:{{ profile.createdAt | formatDate }}</p>
           </b-form>
 
           <div class="modal-footer">

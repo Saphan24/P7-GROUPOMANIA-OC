@@ -3,9 +3,8 @@
     <CreatePostForm :reload="fetchData" />
     <div class="post row justify-content-center mt-5" v-for="post in posts" :key="post.id">
       <b-card class="container col-md-6">
-        
         <button
-          v-if="userId === post.User.userId || post.User.isAdmin"
+          v-if="post.User.id == userId || isAdmin"
           type="button"
           class="close"
           @click.prevent="delPost(post.id)"
@@ -33,11 +32,11 @@
         <div class="commentaires">
           <div v-for="comment in post.Comments" :key="comment.id">
             <br />
-            <div >
+            <div>
               <b-card-group class="col-md-12 text-center">
                 <b-card border-variant="dark" class="bg-secondary text-light">
                   <button
-                    v-if="userId === comment.userId || post.User.isAdmin"
+                    v-if="userId === comment.userId || isAdmin"
                     @click.prevent="DeleteComment(comment.id, comment.userId)"
                     type="button"
                     class="close"
@@ -45,20 +44,21 @@
                   >
                     <span aria-hidden="true">&times;</span>
                   </button>
-                  <p><small>
+                  <p>
+                    <small>
                       <strong>{{ comment.User.username }}</strong>
                       a réagi à {{ comment.createdAt | formatDate }}
-                    </small></p>
+                    </small>
+                  </p>
                   <b-card-text>
-                    
-                      <b-img
-                        class="p-5"
-                        fluid
-                        alt="Fluid image"
-                        v-if="comment.image"
-                        :src="comment.image"
-                      ></b-img>
-                      <p>{{ comment.content }}</p>
+                    <b-img
+                      class="p-5"
+                      fluid
+                      alt="Fluid image"
+                      v-if="comment.image"
+                      :src="comment.image"
+                    ></b-img>
+                    <p>{{ comment.content }}</p>
                   </b-card-text>
                 </b-card>
               </b-card-group>
@@ -76,6 +76,7 @@
 import axios from 'axios'
 import CreatePostForm from '../components/CreatePostForm'
 import CreateCommentForm from '../components/CreateCommentForm.vue'
+import jwt from 'jsonwebtoken'
 
 export default {
   name: 'Posts',
@@ -87,8 +88,9 @@ export default {
     return {
       posts: {},
       comments: [],
-      userId: localStorage.getItem('userId')
-      
+      userId: localStorage.getItem('userId'),
+      isAdmin: jwt.decode(localStorage.getItem("token")).isAdmin
+
     }
   },
   mounted() {
@@ -149,9 +151,7 @@ export default {
             this.fetchData()
           })
           .catch(error => console.log(error));
-
     },
   },
-
 }
 </script>

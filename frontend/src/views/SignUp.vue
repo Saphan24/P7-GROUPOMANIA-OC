@@ -34,9 +34,14 @@
             :class="{ 'is-invalid': submitted && $v.form.email.$error }">
           </b-form-input>
           <div
-            v-if="submitted && !$v.form.email.required"
-            class="invalid-feedback"
-          >Veuillez saisir un email valide</div>
+            v-if="submitted && $v.form.email.$error" class="invalid-feedback">
+            <span v-if="!$v.form.email.required">
+              Veuillez saisir un email
+            </span>
+            <span v-else-if="!$v.form.email.email">
+              Veuillez saisir un email valide
+            </span>
+          </div>
         </b-form-group>
 
         <b-form-group>
@@ -174,13 +179,10 @@ export default {
         this.$router.push("/home");
       })
       .catch(() => {
-        alert( "Cette adresse mail existe déjà !" )
+        alert( "une erreur est survenue dans le formulaire" )
       });
     },
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
-</style>

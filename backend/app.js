@@ -4,6 +4,7 @@ const path = require('path');
 
 require('dotenv').config();
 
+//Importation des router 'user', 'post' et 'comment'
 const userRoutes = require('./routes/user');
 const postRoutes = require('./routes/post');
 const commentRoutes = require('./routes/comment');
